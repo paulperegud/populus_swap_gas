@@ -38,8 +38,9 @@ def test_swap(chain):
                                                      deploy_args=args)
     gas = chain.wait.for_receipt(tx)
     print("contract deployment cost: {}".format(gas['gasUsed']))
-    chain.wait.for_receipt(
+    gas = chain.wait.for_receipt(
         gnt.transact({'from': r_addr}).transfer(swap.address, 100000))
+    print("GNT initial transfer cost: {}".format(gas['gasUsed']))
     random.seed(0)
 
     def mb(x):
