@@ -52,9 +52,9 @@ contract GolemSecretForPaymentSwap {
         if (!gnt.transfer(provider, value))
             throw;
             
-        if (!gnt.transfer(requestor, rem))
-            throw;
+        /* if (!gnt.transfer(requestor, rem)) */
+        /*     throw; */
 
-        selfdestruct(requestor);
+        /* selfdestruct(requestor); */
     }
 }
