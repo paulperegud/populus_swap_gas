@@ -19,15 +19,11 @@ contract GolemSwapChannels {
         gnt = GolemNetworkToken(_gnt);
         requestor = msg.sender;
         allowance = _allowance;
-        /* for (uint i = 0; i < _providers.length; i++) { */
-        /*         isProvider[_providers[i]] = true; */
-        /*     } */
         providers = _providers;
     }
 
     function add_provider(address _provider) external {
         providers.push(_provider);
-        /* isProvider[_provider] = true; */
     }
 
     function all_providers() external returns (address[]) {
@@ -41,10 +37,6 @@ contract GolemSwapChannels {
     function len_providers() external returns (uint) {
         return providers.length;
     }
-
-    /* function is_provider(address sa) external returns (bool) { */
-    /*     return isProvider[sa]; */
-    /* } */
 
     function finalize(bytes32 secret, uint _value, address provider, bytes32 r, bytes32 s, uint8 v)
         external {
