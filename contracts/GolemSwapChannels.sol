@@ -38,10 +38,14 @@ contract GolemSwapChannels {
         return providers.length;
     }
 
-    function finalize(bytes32 secret, uint _value, address provider, bytes32 r, bytes32 s, uint8 v)
-        external {
+    function finalize(bytes32 secret, uint _value, bytes32 r, bytes32 s, uint8 v)
+        external returns (bool) {
 
-        // Check if provider is not attempting double spent
+        // Allowing anyone but provider to close the channel allows requestor to
+        // launch an "close channel with intermediate, low _value" attack
+        var provider = msg.sender;
+
+        // Check if requestor is not attempting double spent
         if (_value > allowance)
             throw;
 
@@ -49,7 +53,7 @@ contract GolemSwapChannels {
 
         var sh = sha3(secret);
         
-        var h = sha3(sh, bytes32(_value));
+        var h = sha3(sh, sha3(provider), bytes32(_value));
 
         var recoveredAddr = ecrecover(h, v, r, s);
         if (recoveredAddr != requestor) {

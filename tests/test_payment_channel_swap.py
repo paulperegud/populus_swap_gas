@@ -6,9 +6,6 @@ import ethereum.utils as utils
 from secp256k1 import PublicKey, ALL_FLAGS, PrivateKey
 import threading
 
-def ops():
-    pass
-
 def fund_and_finalize(chain, gnt, x):
     for i, addr in enumerate(tester.accounts[:10]):
         v = random.randrange(15000 * utils.denoms.ether, 82000 * utils.denoms.ether)
@@ -101,15 +98,15 @@ def finalize_provider(chain, gnt, swap, r_priv, p_addr):
     assert len(secret) == 32
     max_value = swap.call().allowance()
     value = random.randint(1, max_value)
-    # in Solidity: sha3(sha3(secret), bytes32(_value)):
-    msghash = utils.sha3(utils.sha3(secret) + cpack(32, value))
+    # in Solidity: sha3(sha3(secret), sha3(msg.sender), bytes32(_value)):
+    msghash = utils.sha3(utils.sha3(secret) + utils.sha3(p_addr) + cpack(32, value))
     assert len(msghash) == 32
     (V, R, S) = sign_eth(msghash, r_priv)
     ER = cpack(32, R)
     ES = cpack(32, S)
     assert gnt.address == swap.call().gnt()
     prov_balance = gnt.call().balanceOf(p_addr)
-    fin_txn_hash = swap.transact({"from": p_addr}).finalize(secret, value, p_addr, ER, ES, V)
+    fin_txn_hash = swap.transact({"from": p_addr}).finalize(secret, value, ER, ES, V)
     txn = chain.wait.for_receipt(fin_txn_hash)
     new_balance = gnt.call().balanceOf(p_addr)
     assert new_balance == prov_balance + value
